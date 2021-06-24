@@ -3,7 +3,7 @@
     <div class="container mb-4">
       <div class="row">
         <div class="col-md-12">
-          <div class="card">
+          <div class="card" v-if="addState">
             <div class="card-body">
               <div class="card-title mb-4">
                 <h4>Add Music</h4>
@@ -51,7 +51,9 @@
         <div class="col-md-12">
           <div class="card bg-light p-1 showdow-sm">
             <div class="card-title">
-              <button class="btn btn-info m-3">Add Music</button>
+              <button class="btn btn-info m-3" @click="initForm">
+                {{ addState ? "Cancel" : "Add New Music" }}
+              </button>
             </div>
             <div class="card-body">
               <table class="table">
@@ -79,7 +81,12 @@
                     <td>{{ music.artist }}</td>
                     <td>{{ music.created }}</td>
                     <td>
-                      <button class="btn btn-info" @click="deleteMusic(music._id)">Delete</button>
+                      <button
+                        class="btn btn-info"
+                        @click="deleteMusic(music._id)"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 </tbody>
@@ -104,7 +111,8 @@ export default {
       allMusic: [],
       musicLoading: false,
       isValid: false,
-      addLoading: false
+      addLoading: false,
+      addState: false
     }
   },
   computed: {
@@ -119,23 +127,44 @@ export default {
     }
   },
   methods: {
+    initForm () {
+      this.addState = !this.addState;
+    },
     handleFileUpload() {
-      this.musicDetails.music = this.$$refs.file.files[0]
-      console.log(this.musicDetails.music.type)
+      this.musicDetails.music = this.$$refs.file.files[0];
+      console.log(this.musicDetails.music.type);
     },
     addNewMusic() {
-      let types = /(\.|\/)(mp3|mp4)$/i
+      let types = /(\.|\/)(mp3|mp4)$/i;
       if (
         types.test(this.musicDetails.music.type) ||
         types.test(this.musicDetails.music.name)
       ) {
-        console.log('erjkb')
+        let formData = new formData();
+        formData.append('title', this.musicDetails.title);
+        formData.append('artist', this.musicDetails.artist);
+        formData.appened('music', this.musicDetails.music);
+        this.addLoading = true;
+        this.$axios
+          .post('/music', formData)
+          .then(response => {
+            console.log('Adding new music: ', response);
+            this.addLoading = false;
+            this.musicDetails = {};
+            this.getAllMusic(); // Create this function later
+            swal('Success', 'New Music Added', 'success');
+          })
+          .catch(err => {
+            this.addLoading = false;
+            swal('Error', 'Something Went Wrong', 'error');
+            console.log(err);
+          })
       } else {
-        alert('Invalid file type')
-        return !this.isValid
+        swal('Error', 'Invalid File Type', 'error');
+        return !this.isValid;
       }
     },
-    async getAllMusics() {
+    async getAllMusic() {
       this.musicLoading = true
       try {
         let data = await this.$axios.$get('/music')
@@ -145,10 +174,36 @@ export default {
         this.musicLoading = false
         swal('Error', 'Error Fetting Musics', 'error')
       }
+    },
+    deleteMusic(id) {
+      swal({
+        title: 'Are you sure?',
+        text: 'Once delete you will not be able to recover this music!',
+        icon: 'warning',
+        buttons: true,
+        dangerMode: true
+      })
+      .then(willDelete => {
+        if (willDelete) {
+          this.$axios
+            .$delete('/music/' + id)
+            .then(response => {
+              this.getAllMusic();
+              swal('Poof! Your music file has been deleted!', {
+                icon: 'success'
+              })
+            })
+            .catch(err => {
+              swal('Error', 'Something went wrong!', 'error');
+            })
+        } else {
+          swal('Your music file is save!');
+        }
+      })
     }
   },
   created() {
-    this.getAllMusics();
+    this.getAllMusic();
   }
 }
 </script>

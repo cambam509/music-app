@@ -3,7 +3,7 @@
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-info">
       <div class="container">
-        <a class="navbar-brand" href="/">Music App</a>
+        <nuxt-link to="/" class="navbar-brand">CamBam's Music App</nuxt-link>
         <button
           class="navbar-toggler"
           type="button"
@@ -18,10 +18,10 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item active">
-              <a class="nav-link" href="#">Player</a>
+              <nuxt-link to="/" class="nav-link"> Audio Player</nuxt-link>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/manager">Manager</a>
+              <nuxt-link to="/manager" class="nav-link">Song Manager</nuxt-link>
             </li>
           </ul>
         </div>
