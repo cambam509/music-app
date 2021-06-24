@@ -1,6 +1,8 @@
-### musicapp
+# musicapp
 
 ![Music App Snapshot](https://user-images.githubusercontent.com/63881824/123333790-0cb2ff00-d4f7-11eb-8515-cf002b711880.png)
+
+![Add Music](https://user-images.githubusercontent.com/63881824/123333984-4a178c80-d4f7-11eb-95d1-3ed5d80bea11.png)
 
 
 ## Build Setup
